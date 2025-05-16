@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Humanistische Reise – Interaktives Rad</title>
+  <style>
+    :root {
+      --main-bg: #fdf6ef;
+      --main-color: #3e2f1c;
+      --accent: #d6a75c;
+      --highlight: #b8926a;
+      --correct: #a2e58c;
+      --wrong: #f28b82;
+    }
+
+    body {
+      font-family: 'Georgia', serif;
+      margin: 0;
+      background: var(--main-bg) url('https://st2.depositphotos.com/6833366/10830/v/950/depositphotos_108303380-stock-illustration-seamless-outline-books-pattern-vector.jpg') repeat;
+      background-size: cover;
+      color: var(--main-color);
+    }
+
+    header {
+      background: rgba(62, 47, 28, 0.95);
+      color: #fff;
+      padding: 25px;
+      text-align: center;
+      font-size: 2.5em;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .wheel-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .wheel {
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background-image: conic-gradient(
+        #f4b393 0deg 90deg,
+        #94e4b7 90deg 180deg,
+        #a5aef1 180deg 270deg,
+        #f5e68f 270deg 360deg
+      );
+      position: relative;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+      border: 6px solid #fff;
+    }
+
+    .wheel:before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 25px;
+      height: 25px;
+      background: var(--main-color);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+
+    .spin-btn {
+      position: absolute;
+      bottom: -65px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--main-color);
+      color: #fff;
+      font-size: 1.4em;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .spin-btn:hover {
+      background-color: var(--accent);
+      color: var(--main-color);
+    }
+
+    .question-container {
+      text-align: center;
+      margin-top: 40px;
+      background: rgba(255, 255, 255, 0.85);
+      margin: 40px 20px;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .answers {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .answers button {
+      margin: 10px;
+      padding: 12px 20px;
+      font-size: 1.1em;
+      background-color: var(--highlight);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s ease;
+      max-width: 300px;
+      min-width: 180px;
+    }
+
+    .answers button:hover {
+      background-color: var(--accent);
+      color: #000;
+    }
+
+    .answers button.correct {
+      background-color: var(--correct);
+      color: #000;
+    }
+
+    .answers button.wrong {
+      background-color: var(--wrong);
+      color: #000;
+    }
+
+    #score {
+      font-size: 1.2em;
+      margin-top: 20px;
+    }
+
+    footer {
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      text-align: center;
+      padding: 10px;
+      font-size: 0.9em;
+      margin-top: 40px;
+    }
+
+    footer a {
+      color: #f2cf8d;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>🎓 Humanistische Reise – Interaktives Rad</header>
+
+  <div class="wheel-container">
+    <div class="wheel" id="wheel">
+      <button class="spin-btn" id="spin-btn">Rad drehen</button>
+    </div>
+  </div>
+
+  <div class="question-container hidden" id="question-container">
+    <div id="question">Frage wird geladen...</div>
+    <div class="answers" id="answers"></div>
+    <div id="score">Punkte: 0</div>
+  </div>
+
+  <footer>
+    <p>Images from <a href="https://www.freepik.com" target="_blank">Freepik.com</a></p>
+    <p>Code Copyright 2025 © <a href="https://www.dhleitfaden.eu" target="_blank">www.dhleitfaden.eu</a></p>
+  </footer>
+
+  <script>
+    const categories = [
+      {
+        name: 'Geschichte',
+        questions: [
+          {
+            question: 'Wer war der erste römische Kaiser?',
+            answers: ['Cäsar', 'Augustus', 'Nero', 'Konstantin'],
+            correct: 'Augustus'
+          },
+          {
+            question: 'Wann fiel das Weströmische Reich?',
+            answers: ['476 n. Chr.', '500 n. Chr.', '395 n. Chr.', '350 n. Chr.'],
+            correct: '476 n. Chr.'
+          }
+        ]
+      },
+      {
+        name: 'Philosophie',
+        questions: [
+          {
+            question: 'Wer gilt als Begründer des Empirismus?',
+            answers: ['Platon', 'Aristoteles', 'Locke', 'Hume'],
+            correct: 'Locke'
+          },
+          {
+            question: 'Was bedeutet "Cogito ergo sum"?',
+            answers: ['Ich denke, also bin ich', 'Ich lebe, also existiere ich', 'Ich lerne, also wachse ich', 'Ich existiere, also denke ich'],
+            correct: 'Ich denke, also bin ich'
+          }
+        ]
+      },
+      {
+        name: 'Kunst',
+        questions: [
+          {
+            question: 'Wer malte die "Mona Lisa"?',
+            answers: ['Michelangelo', 'Raffael', 'Leonardo da Vinci', 'Caravaggio'],
+            correct: 'Leonardo da Vinci'
+          },
+          {
+            question: 'In welcher Stadt befindet sich der Louvre?',
+            answers: ['Rom', 'Paris', 'London', 'Madrid'],
+            correct: 'Paris'
+          }
+        ]
+      },
+      {
+        name: 'Literatur',
+        questions: [
+          {
+            question: 'Wer schrieb die "Göttliche Komödie"?',
+            answers: ['Petrarca', 'Boccaccio', 'Dante Alighieri', 'Machiavelli'],
+            correct: 'Dante Alighieri'
+          },
+          {
+            question: 'Wer schrieb "1984"?',
+            answers: ['Aldous Huxley', 'Ray Bradbury', 'George Orwell', 'Philip K. Dick'],
+            correct: 'George Orwell'
+          }
+        ]
+      }
+    ];
+
+    let currentCategory = '';
+    let currentQuestion = 0;
+    let score = 0;
+
+    const spinBtn = document.getElementById("spin-btn");
+    const wheel = document.getElementById("wheel");
+    const questionContainer = document.getElementById("question-container");
+    const questionText = document.getElementById("question");
+    const answersDiv = document.getElementById("answers");
+    const scoreDisplay = document.getElementById("score");
+
+    spinBtn.addEventListener('click', () => {
+      const randomAngle = Math.floor(Math.random() * 3600) + 3600;
+      wheel.style.transition = 'transform 3s ease-out';
+      wheel.style.transform = `rotate(${randomAngle}deg)`;
+
+      setTimeout(() => {
+        const categoryIndex = Math.floor((randomAngle % 360) / (360 / categories.length));
+        currentCategory = categories[categoryIndex];
+        currentQuestion = 0;
+        startQuestion();
+      }, 3000);
+    });
+
+    function startQuestion() {
+      questionContainer.classList.remove('hidden');
+      const question = currentCategory.questions[currentQuestion];
+
+      questionText.textContent = question.question;
+      answersDiv.innerHTML = '';
+      question.answers.forEach(answer => {
+        const button = document.createElement('button');
+        button.textContent = answer;
+        button.addEventListener('click', () => checkAnswer(button, answer, question.correct));
+        answersDiv.appendChild(button);
+      });
+    }
+
+    function checkAnswer(button, selectedAnswer, correctAnswer) {
+      if (selectedAnswer === correctAnswer) {
+        score++;
+        button.classList.add('correct');
+      } else {
+        button.classList.add('wrong');
+      }
+
+      scoreDisplay.textContent = `Punkte: ${score}`;
+      currentQuestion++;
+
+      if (currentQuestion < currentCategory.questions.length) {
+        setTimeout(() => {
+          startQuestion();
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          alert(`Quiz beendet! Dein Punktestand: ${score}`);
+        }, 1500);
+      }
+    }
+  </script>
+</body>
+</html>
