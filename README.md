@@ -1,1 +1,3 @@
 This project is an interactive quiz game based on a spinning wheel, which randomly selects a category (e.g., History, Art, etc.). After each spin, the user is presented with a multiple-choice question.
+
+For details, read: https://www.dhleitfaden.eu/educational-explanation-of-the-code/
