@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Humanistische Reise</title>
+  <style>
+    /* Global styling */
+    body {
+      font-family: 'Georgia', serif;
+      margin: 0;
+      padding: 0;
+        background: url('https://st2.depositphotos.com/6833366/10830/v/950/depositphotos_108303380-stock-illustration-seamless-outline-books-pattern-vector.jpg'), linear-gradient(to right, #f5f0e1, #e6dcc2);
+        background-size: cover;
+      background-attachment: fixed;
+      color: #3e2f1c;
+      overflow-x: hidden;
+    }
+
+    /* Header styling */
+    header {
+      background-color: rgba(107, 66, 38, 0.8);
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      font-size: 2.5em;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Layout container */
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: row;
+      gap: 30px;
+      justify-content: space-between;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .tutor {
+      flex: 1;
+      text-align: center;
+    }
+
+    .tutor img {
+      max-width: 180px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      transition: transform 0.2s;
+    }
+
+    .tutor img:hover {
+      transform: scale(1.1);
+    }
+
+    .game {
+      flex: 2;
+    }
+
+    .question {
+      font-size: 1.6em;
+      margin-bottom: 30px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .answers button {
+      display: block;
+      margin: 15px 0;
+      padding: 12px 15px;
+      width: 100%;
+      font-size: 1.1em;
+      background-color: #f2cf8d;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .answers button:hover {
+      background-color: #d6a75c;
+    }
+
+    .answers button.correct {
+      background-color: #b2e58c;
+    }
+
+    .answers button.wrong {
+      background-color: #f5a9a9;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    #score {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 1.2em;
+      font-style: italic;
+    }
+
+    .speech-bubble {
+      background: #fdf2d0;
+      padding: 15px 20px;
+      border-radius: 20px;
+      position: relative;
+      font-style: italic;
+      font-size: 1.1em;
+      margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 15px 15px 0;
+      border-style: solid;
+      border-color: #fdf2d0 transparent transparent;
+    }
+
+    #tutorial {
+      max-width: 700px;
+      margin: 40px auto;
+      background-color: rgba(255, 255, 255, 0.85);
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+    }
+
+    #start-btn {
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 1.2em;
+      background-color: #6b4226;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    #start-btn:hover {
+      background-color: #3e2f1c;
+      transform: scale(1.05);
+    }
+
+    /* Footer styling */
+    footer {
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 1em;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    footer a {
+      color: #f2cf8d;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>🎓 Humanistische Reise</header>
+
+  <!-- TUTORIAL -->
+  <div id="tutorial">
+    <h2>Willkommen zur "Humanistischen Reise"!</h2>
+    <p>In diesem Spiel reist du durch Geschichte, Philosophie, Kunst und Literatur – begleitet von deinem Tutor: <strong>Professor Humanistius</strong>.</p>
+    <p>Du wirst Multiple-Choice-Fragen beantworten. Für jede richtige Antwort erhältst du einen Punkt und ein Lob. Bei falschen Antworten erfährst du die richtige Lösung – ganz im Sinne echter Humanisten.</p>
+    <p>Am Ende feiern wir deine Leistung mit einem Konfetti-Regen!</p>
+    <p><strong>Bist du bereit, deinen Verstand herauszufordern und Spaß zu haben?</strong></p>
+    <button id="start-btn">Spiel starten</button>
+  </div>
+
+  <!-- SPIEL -->
+  <div class="container hidden" id="game-container">
+    <div class="tutor">    <img src="https://img.freepik.com/premium-photo/teachers-aide-digital-avatar-generative-ai_934475-9357.jpg" alt="Tutor">
+ 
+      <div class="speech-bubble" id="tutor-text">Willkommen, Suchender des Wissens! Bereit für eine Herausforderung?</div>
+    </div>
+
+    <div class="game">
+      <div class="question" id="question">Lade Frage...</div>
+      <div class="answers" id="answers"></div>
+      <div id="result"></div>
+      <div id="score">Punktestand: 0</div>
+    </div>
+  </div>
+
+  <!-- SOUNDS -->
+  <audio id="correct-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
+  <audio id="wrong-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+
+  <!-- CONFETTI -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    const startBtn = document.getElementById("start-btn");
+    const tutorial = document.getElementById("tutorial");
+    const gameContainer = document.getElementById("game-container");
+
+    startBtn.addEventListener("click", () => {
+      tutorial.classList.add("hidden");
+      gameContainer.classList.remove("hidden");
+      showQuestion();
+    });
+
+    const tutorQuotes = [
+      "Willkommen, Suchender des Wissens! Bereit für eine Herausforderung?",
+      "Antworte weise, wie Cicero es tun würde.",
+      "Auch Leonardo begann mit einer Frage...",
+      "Wissen ist eine Reise, kein Ziel!",
+      "Lass deinen Geist so scharf sein wie Machiavellis Feder."
+    ];
+
+    const questions = [
+      {
+        question: "Wer schrieb die 'Göttliche Komödie'?",
+        answers: ["Petrarca", "Boccaccio", "Dante Alighieri", "Machiavelli"],
+        correct: "Dante Alighieri"
+      },
+      {
+        question: "Wann war die Renaissance?",
+        answers: ["11.–13. Jahrhundert", "14.–17. Jahrhundert", "18. Jahrhundert", "19. Jahrhundert"],
+        correct: "14.–17. Jahrhundert"
+      },
+      {
+        question: "Was war die Aufklärung?",
+        answers: [
+          "Eine mittelalterliche Kunstbewegung",
+          "Eine Epoche der Vernunft und des Wissens",
+          "Eine religiöse Strömung",
+          "Eine politische Revolution"
+        ],
+        correct: "Eine Epoche der Vernunft und des Wissens"
+      },
+      {
+        question: "Wer malte die Sixtinische Kapelle?",
+        answers: ["Leonardo da Vinci", "Michelangelo", "Raffael", "Giotto"],
+        correct: "Michelangelo"
+      },
+      {
+        question: "Was studierten Philologen im Mittelalter?",
+        answers: ["Naturwissenschaften", "Heilige und klassische Texte", "Medizin", "Musik"],
+        correct: "Heilige und klassische Texte"
+      }
+    ];
+
+    const correctSound = document.getElementById("correct-sound");
+    const wrongSound = document.getElementById("wrong-sound");
+
+    let score = 0;
+    let current = 0;
+
+    function showQuestion() {
+      const q = questions[current];
+      document.getElementById("question").textContent = q.question;
+
+      const answersDiv = document.getElementById("answers");
+      answersDiv.innerHTML = "";
+
+      q.answers.forEach(answer => {
+        const btn = document.createElement("button");
+        btn.textContent = answer;
+        btn.onclick = () => checkAnswer(btn, answer);
+        answersDiv.appendChild(btn);
+      });
+
+      document.getElementById("tutor-text").textContent = tutorQuotes[Math.floor(Math.random() * tutorQuotes.length)];
+      document.getElementById("result").textContent = "";
+    }
+
+    function checkAnswer(button, selected) {
+      const correct = questions[current].correct;
+      const result = document.getElementById("result");
+      const buttons = document.querySelectorAll(".answers button");
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      if (selected === correct) {
+        result.textContent = "✅ Richtig!";
+        button.classList.add("correct");
+        correctSound.play();
+        score++;
+      } else {
+        result.textContent = `❌ Falsch! Die richtige Antwort war: ${correct}`;
+        button.classList.add("wrong");
+        wrongSound.play();
+        buttons.forEach(btn => {
+          if (btn.textContent === correct) {
+            btn.classList.add("correct");
+          }
+        });
+      }
+
+      document.getElementById("score").textContent = `Punktestand: ${score}`;
+
+      current++;
+      if (current < questions.length) {
+        setTimeout(showQuestion, 2500);
+      } else {
+        setTimeout(() => {
+          document.getElementById("question").textContent = "🎉 Das Abenteuer ist vorbei!";
+          document.getElementById("answers").innerHTML = "";
+          document.getElementById("result").textContent = `Du hast ${score} von ${questions.length} Fragen richtig beantwortet.`;
+          confetti();
+        }, 1500);
+      }
+    }
+  </script>
+
+  <!-- Footer -->
+  <footer>
+    <p>Images from <a href="https://www.freepik.com" target="_blank">Freepik.com</a></p>
+    <p>Code Copyright 2025 © <a href="https://www.dhleitfaden.eu" target="_blank">www.dhleitfaden.eu</a></p>
+  </footer>
+</body>
+</html>
