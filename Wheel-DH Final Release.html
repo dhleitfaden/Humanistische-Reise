@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ruota della Fortuna - Digital Humanities</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      text-align: center;
+      padding: 20px;
+    }
+    .wheel {
+      width: 300px;
+      height: 300px;
+      margin: 0 auto;
+      border: 10px solid #333;
+      border-radius: 50%;
+      background: url('wheel.png') no-repeat center center;
+      background-size: cover;
+      transition: transform 2s ease-in-out;
+    }
+    .card {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+    .player-info {
+      margin: 10px 0;
+    }
+    .choices button {
+      display: block;
+      margin: 5px auto;
+      padding: 10px 15px;
+      border: none;
+      background-color: #ddd;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .choices button:hover {
+      background-color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ruota della Fortuna - Digital Humanities</h1>
+  <div class="player-info">
+    <p>Turno di: <span id="currentPlayer">Giocatore 1</span></p>
+    <p>Punteggio: <span id="score1">0</span> - <span id="score2">0</span></p>
+  </div>
+  <div class="wheel" id="wheel"></div>
+  <button onclick="spinWheel()">Gira la Ruota</button>
+  <div id="question" style="margin-top:20px;"></div>
+  <h2>Carte del Giocatore</h2>
+  <div id="cards"></div>
+
+  <script>
+    const categories = ["Storia", "Linguistica", "Filosofia", "Letteratura", "Arte", "Musica"];
+    const questions = {
+      Storia: [
+        {q: "Quando è iniziata la Prima Guerra Mondiale?", a: ["1914", "1939", "1815", "1600"], c: 0},
+        {q: "Chi era Giulio Cesare?", a: ["Imperatore romano", "Filosofo greco", "Poeta fiorentino", "Compositore barocco"], c: 0}
+      ],
+      Linguistica: [
+        {q: "Cos'è un morfema?", a: ["Unità minima di significato", "Tipo di musica", "Opera d’arte", "Teorema matematico"], c: 0},
+        {q: "Qual è la differenza tra lingua e dialetto?", a: ["Lingua ha status ufficiale", "Dialetto è più vecchio", "Lingua è più difficile", "Dialetto è una lingua estinta"], c: 0}
+      ],
+      Filosofia: [
+        {q: "Chi ha scritto 'Critica della ragion pura'?", a: ["Immanuel Kant", "Platone", "Nietzsche", "Cartesio"], c: 0},
+        {q: "Cos'è il dualismo cartesiano?", a: ["Separazione mente-corpo", "Guerra di religione", "Sistema economico", "Corrente artistica"], c: 0}
+      ],
+      Letteratura: [
+        {q: "Chi ha scritto 'La Divina Commedia'?", a: ["Dante Alighieri", "Boccaccio", "Leopardi", "Manzoni"], c: 0},
+        {q: "Che cos'è un sonetto?", a: ["Forma poetica", "Danza medievale", "Opera lirica", "Stile pittorico"], c: 0}
+      ],
+      Arte: [
+        {q: "Chi ha dipinto la Gioconda?", a: ["Leonardo da Vinci", "Michelangelo", "Caravaggio", "Raffaello"], c: 0},
+        {q: "Cos'è il Rinascimento?", a: ["Periodo artistico-culturale", "Sistema filosofico", "Guerra religiosa", "Forma poetica"], c: 0}
+      ],
+      Musica: [
+        {q: "Chi ha composto la Nona Sinfonia?", a: ["Beethoven", "Mozart", "Bach", "Vivaldi"], c: 0},
+        {q: "Cos'è un'armonia?", a: ["Combinazione di suoni", "Stile pittorico", "Opera architettonica", "Strumento musicale"], c: 0}
+      ]
+    };
+
+    const playerCards = ["Jolly", "Cambio Categoria", "Domanda Doppia", "Passa Turno"];
+    let currentPlayer = 1;
+    let scores = { 1: 0, 2: 0 };
+    let skipNextTurn = false;
+    let doubleQuestion = false;
+
+    function spinWheel() {
+      if (skipNextTurn) {
+        skipNextTurn = false;
+        nextTurn();
+        alert("Turno saltato!");
+        return;
+      }
+
+      const angle = 720 + Math.floor(Math.random() * 360);
+      document.getElementById("wheel").style.transform = `rotate(${angle}deg)`;
+      const index = Math.floor(Math.random() * categories.length);
+      const category = categories[index];
+      const questionObj = questions[category][Math.floor(Math.random() * questions[category].length)];
+
+      let html = `<h3>${category}</h3><p>${questionObj.q}</p><div class='choices'>`;
+      questionObj.a.forEach((option, i) => {
+        html += `<button onclick='selectAnswer(${i}, ${questionObj.c})'>${option}</button>`;
+      });
+      html += '</div>';
+
+      document.getElementById("question").innerHTML = html;
+    }
+
+    function selectAnswer(selected, correct) {
+      if (selected === correct) {
+        scores[currentPlayer] += doubleQuestion ? 20 : 10;
+        alert("Risposta corretta!");
+      } else {
+        alert("Risposta sbagliata!");
+      }
+      doubleQuestion = false;
+      updateScore();
+      nextTurn();
+    }
+
+    function updateScore() {
+      document.getElementById("score1").textContent = scores[1];
+      document.getElementById("score2").textContent = scores[2];
+    }
+
+    function nextTurn() {
+      currentPlayer = currentPlayer === 1 ? 2 : 1;
+      document.getElementById("currentPlayer").textContent = `Giocatore ${currentPlayer}`;
+      renderCards();
+    }
+
+    function useCard(card) {
+      switch (card) {
+        case "Jolly":
+          scores[currentPlayer] += 15;
+          alert("Hai usato un Jolly! +15 punti");
+          break;
+        case "Cambio Categoria":
+          const newCategory = prompt("Inserisci la categoria desiderata:", categories[0]);
+          if (questions[newCategory]) {
+            const q = questions[newCategory][Math.floor(Math.random() * questions[newCategory].length)];
+            let html = `<h3>${newCategory}</h3><p>${q.q}</p><div class='choices'>`;
+            q.a.forEach((opt, i) => {
+              html += `<button onclick='selectAnswer(${i}, ${q.c})'>${opt}</button>`;
+            });
+            html += '</div>';
+            document.getElementById("question").innerHTML = html;
+            return;
+          }
+          break;
+        case "Domanda Doppia":
+          doubleQuestion = true;
+          alert("Domanda doppia attivata!");
+          break;
+        case "Passa Turno":
+          skipNextTurn = true;
+          alert("Il prossimo turno sarà saltato");
+          break;
+      }
+      updateScore();
+    }
+
+    function renderCards() {
+      const cardContainer = document.getElementById("cards");
+      cardContainer.innerHTML = "";
+      playerCards.forEach(card => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.textContent = card;
+        div.onclick = () => useCard(card);
+        cardContainer.appendChild(div);
+      });
+    }
+
+    renderCards();
+  </script>
+</body>
+</html>
